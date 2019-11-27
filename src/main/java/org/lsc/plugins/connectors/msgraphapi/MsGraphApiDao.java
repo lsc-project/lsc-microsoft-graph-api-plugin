@@ -70,6 +70,7 @@ public class MsGraphApiDao {
     protected static final Logger LOGGER = LoggerFactory.getLogger(MsGraphApiDao.class);
     private final Client client;
     private final Optional<Integer> pageSize;
+    private final String pivot;
 
     private WebTarget usersClient;
 
@@ -78,7 +79,8 @@ public class MsGraphApiDao {
 
     public MsGraphApiDao(String token, MsGraphApiUsersService serviceConfiguration) {
         authorizationBearer = "Bearer " + token;
-        this.filter = Optional.ofNullable(serviceConfiguration.getFilter()).filter(filter -> !filter.trim().isEmpty());
+        this.filter = getStringParameter(serviceConfiguration.getFilter());
+        this.pivot = getStringParameter(serviceConfiguration.getPivot()).orElse("mail");
         this.pageSize = Optional.ofNullable(serviceConfiguration.getPageSize()).filter(size -> size > 0);
         LOGGER.debug("bearer " + authorizationBearer);
         client = ClientBuilder.newClient()
@@ -89,8 +91,12 @@ public class MsGraphApiDao {
             .path(USER_PATH);
     }
 
+    private Optional<String> getStringParameter(String parameter) {
+        return Optional.ofNullable(parameter).filter(filter -> !filter.trim().isEmpty());
+    }
+
     public List<User> getUsersList() throws LscServiceException {
-        WebTarget target = usersClient.queryParam("$select", "mail");
+        WebTarget target = usersClient.queryParam("$select", pivot);
 
         if (filter.isPresent()) {
             target = target.queryParam("$filter", filter.get());
@@ -113,10 +119,9 @@ public class MsGraphApiDao {
         return usersResponsesPages
             .stream()
             .flatMap(response -> response.getValue().stream())
-            .map(map -> map.get("mail"))
+            .map(map -> map.get(pivot))
             .filter(Objects::nonNull)
-            .map(mail -> new User(mail.toString())).collect(Collectors.toList());
-
+            .map(pivotValue -> new User(pivot, pivotValue.toString())).collect(Collectors.toList());
     }
 
     private UsersListResponse getUsersListResponse(WebTarget target) throws LscServiceException {
@@ -137,8 +142,6 @@ public class MsGraphApiDao {
                 response.close();
             }
         }
-
-
     }
 
     private static boolean checkResponse(Response response) {

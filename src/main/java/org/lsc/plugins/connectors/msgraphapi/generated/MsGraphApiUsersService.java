@@ -2,7 +2,7 @@
 // Ce fichier a été généré par l'implémentation de référence JavaTM Architecture for XML Binding (JAXB), v2.2.8-b130911.1802 
 // Voir <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Toute modification apportée à ce fichier sera perdue lors de la recompilation du schéma source. 
-// Généré le : 2019.11.27 à 02:41:53 PM CET 
+// Généré le : 2019.11.27 à 03:09:52 PM CET 
 //
 
 
@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;extension base="{http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd}msGraphApiService">
  *       &lt;sequence>
  *         &lt;element name="filter" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
+ *         &lt;element name="pivot" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="pageSize" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/extension>
@@ -38,6 +39,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "filter",
+    "pivot",
     "pageSize"
 })
 @XmlRootElement(name = "msGraphApiUsersService", namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd")
@@ -47,6 +49,8 @@ public class MsGraphApiUsersService
 
     @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd")
     protected String filter;
+    @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd")
+    protected String pivot;
     @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd")
     protected Integer pageSize;
 
@@ -72,6 +76,30 @@ public class MsGraphApiUsersService
      */
     public void setFilter(String value) {
         this.filter = value;
+    }
+
+    /**
+     * Obtient la valeur de la propriété pivot.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getPivot() {
+        return pivot;
+    }
+
+    /**
+     * Définit la valeur de la propriété pivot.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setPivot(String value) {
+        this.pivot = value;
     }
 
     /**

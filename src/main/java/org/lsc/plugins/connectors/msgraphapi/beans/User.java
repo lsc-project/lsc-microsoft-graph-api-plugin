@@ -46,16 +46,25 @@ import org.lsc.LscDatasets;
 
 public class User {
 
-	public User(String email) {
-		this.email = email;
-	}
+	private final String pivotAttribute;
+	private final String value;
 
-	public final String email;
+	public User(String pivotAttribute, String value) {
+		this.pivotAttribute = pivotAttribute;
+		this.value = value;
+	}
 
 	public LscDatasets toDatasets() {
 		LscDatasets datasets = new LscDatasets();
-		datasets.put("email", email);
+		datasets.put(pivotAttribute, value);
 		return datasets;
 	}
 
+	public String getPivotAttribute() {
+		return pivotAttribute;
+	}
+
+	public String getValue() {
+		return value;
+	}
 }

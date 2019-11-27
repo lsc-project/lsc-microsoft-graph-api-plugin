@@ -51,14 +51,12 @@ import javax.ws.rs.WebApplicationException;
 
 import org.lsc.LscDatasets;
 import org.lsc.beans.IBean;
-import org.lsc.configuration.PluginConnectionType;
 import org.lsc.configuration.TaskType;
 import org.lsc.exception.LscServiceCommunicationException;
 import org.lsc.exception.LscServiceConfigurationException;
 import org.lsc.exception.LscServiceException;
 import org.lsc.plugins.connectors.msgraphapi.beans.User;
 import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiConnectionType;
-import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiService;
 import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiUsersService;
 import org.lsc.service.IService;
 import org.slf4j.Logger;
@@ -111,7 +109,7 @@ public class MsGraphApiUsersSrcService implements IService {
 
             Map<String, LscDatasets> listPivots = new HashMap<String, LscDatasets>();
             for (User user: userList) {
-                listPivots.put(user.email, user.toDatasets());
+                listPivots.put(user.getValue(), user.toDatasets());
             }
             return ImmutableMap.copyOf(listPivots);
         } catch (ProcessingException e) {

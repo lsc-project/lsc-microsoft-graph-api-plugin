@@ -149,4 +149,20 @@ class MsGraphApiUsersServiceTest {
         assertThatThrownBy(testee::getListPivots).isInstanceOf(LscServiceException.class);
     }
 
+    @Test
+    void listPivotShouldReturnOneUserWhenOneResultWithConfiguredPivot() throws LscServiceException {
+        when(usersService.getPivot()).thenReturn("id");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> listPivots = testee.getListPivots();
+
+        String first = listPivots.keySet().stream().findFirst().get();
+
+        when(usersService.getFilter()).thenReturn("id eq '" + first + "'");
+        testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> actual = testee.getListPivots();
+        assertThat(actual).hasSize(1);
+    }
+
 }
