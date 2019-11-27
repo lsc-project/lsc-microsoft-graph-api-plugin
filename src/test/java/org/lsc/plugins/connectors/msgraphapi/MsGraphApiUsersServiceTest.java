@@ -53,6 +53,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.lsc.LscDatasets;
+import org.lsc.beans.IBean;
 import org.lsc.configuration.PluginSourceServiceType;
 import org.lsc.configuration.ServiceType;
 import org.lsc.configuration.TaskType;
@@ -61,8 +62,10 @@ import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiConnectionType;
 import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiUsersService;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 class MsGraphApiUsersServiceTest {
+    private static final boolean FROM_SAME_SERVICE = true;
 
     private static TaskType task;
     private MsGraphApiUsersService usersService;
@@ -165,4 +168,54 @@ class MsGraphApiUsersServiceTest {
         assertThat(actual).hasSize(1);
     }
 
+    @Test
+    public void getBeanShouldReturnNullWhenEmptyDataset() throws Exception {
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        assertThat(testee.getBean("id", new LscDatasets(), FROM_SAME_SERVICE)).isNull();
+    }
+
+    @Test
+    public void getBeanShouldReturnNullWhenNoMatchingMail() throws Exception {
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        LscDatasets nonExistingIdDataset = new LscDatasets(ImmutableMap.of("mail", "502e48b1-40e7-4c6c-91ec-13a51b679849"));
+        assertThat(testee.getBean("mail", nonExistingIdDataset, FROM_SAME_SERVICE))
+            .isNull();
+    }
+
+    @Test
+    public void getBeanShouldReturnNullWhenNoMatchingId() throws Exception {
+        when(usersService.getPivot()).thenReturn("id");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        LscDatasets nonExistingIdDataset = new LscDatasets(ImmutableMap.of("id", "nonExistingId"));
+        assertThat(testee.getBean("id", nonExistingIdDataset, FROM_SAME_SERVICE))
+            .isNull();
+    }
+
+    @Test
+    public void getBeanShouldReturnMainIdentifierSetToMail() throws Exception {
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        IBean bean = testee.getBean("mail", pivots.get(firstUserPivotValue), FROM_SAME_SERVICE);
+
+        assertThat(bean.getMainIdentifier()).isEqualTo(firstUserPivotValue);
+
+    }
+
+    @Test
+    public void getBeanShouldReturnMainIdentifierSetToIdWhenIdAsAPivot() throws Exception {
+        when(usersService.getPivot()).thenReturn("id");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        IBean bean = testee.getBean("id", pivots.get(firstUserPivotValue), FROM_SAME_SERVICE);
+
+        assertThat(bean.getMainIdentifier()).isEqualTo(firstUserPivotValue);
+
+    }
 }

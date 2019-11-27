@@ -46,6 +46,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.WebApplicationException;
 
@@ -98,8 +99,50 @@ public class MsGraphApiUsersSrcService implements IService {
     }
 
     @Override
-    public IBean getBean(String s, LscDatasets lscDatasets, boolean b) throws LscServiceException {
-        return null;
+    public IBean getBean(String pivoteAttributeName, LscDatasets pivotAttributes, boolean fromSameService) throws LscServiceException {
+        LOGGER.debug(String.format("Call to getBean(%s, %s, %b)", pivoteAttributeName, pivotAttributes, fromSameService));
+        if (pivotAttributes.getAttributesNames().size() < 1) {
+            return null;
+        }
+        String pivotAttribute = pivotAttributes.getAttributesNames().get(0);
+        String pivotValue = pivotAttributes.getStringValueAttribute(pivotAttribute);
+        if (pivotValue == null) {
+            return null;
+        }
+        try {
+            Map<String, Object> user = dao.getUserDetails(pivotValue);
+            return mapToBean(pivotAttribute, user);
+        } catch (ProcessingException e) {
+            LOGGER.error(String.format("ProcessingException while getting bean %s/%s (%s)",
+                pivoteAttributeName, pivotValue, e));
+            LOGGER.error(e.toString(), e);
+            throw new LscServiceCommunicationException(e);
+        } catch (NotFoundException e) {
+            LOGGER.debug(String.format("%s/%s not found", pivoteAttributeName, pivotValue));
+            return null;
+        } catch (WebApplicationException e) {
+            LOGGER.error(String.format("WebApplicationException while getting bean %s/%s (%s)",
+                pivoteAttributeName, pivotValue, e));
+            LOGGER.debug(e.toString(), e);
+            throw new LscServiceException(e);
+        } catch (InstantiationException | IllegalAccessException e) {
+            LOGGER.error("Bad class name: " + beanClass.getName() + "(" + e + ")");
+            LOGGER.debug(e.toString(), e);
+            throw new LscServiceException(e);
+        }
+    }
+
+    private IBean mapToBean(String pivotName, Map<String, Object> user) throws InstantiationException, IllegalAccessException {
+        IBean bean = beanClass.newInstance();
+        Object userValue = user.get(pivotName);
+        if(userValue == null) {
+            return null;
+        }
+
+        bean.setMainIdentifier(userValue.toString());
+        //TODO Fix me
+        bean.setDatasets(new LscDatasets(user));
+        return bean;
     }
 
     @Override

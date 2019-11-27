@@ -43,7 +43,9 @@
 package org.lsc.plugins.connectors.msgraphapi;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -63,6 +65,8 @@ import org.lsc.plugins.connectors.msgraphapi.beans.UsersListResponse;
 import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiUsersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableMap;
 
 public class MsGraphApiDao {
     public static final String USER_PATH = "/users";
@@ -148,4 +152,41 @@ public class MsGraphApiDao {
         return Response.Status.Family.familyOf(response.getStatus()) == Response.Status.Family.SUCCESSFUL;
     }
 
+    public Map<String, Object> getUserDetails(String pivotValue) throws LscServiceException {
+
+        Response response = null;
+        try {
+            String pivotFilter = pivot + " eq '" + pivotValue + "'";
+            WebTarget target = filter
+                .map(filter -> usersClient.queryParam("$filter", "(" + filter + ") and " + pivotFilter))
+                .orElseGet(() -> usersClient.queryParam("$filter", pivotFilter));
+
+            LOGGER.debug("GETting users detail : " + target.getUri().toString());
+
+            response = target
+                .request()
+                .header(HttpHeaders.AUTHORIZATION, authorizationBearer)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+            Map<String, Object> EMPTY_BEAN_RESPONSE = getStringObjectImmutableMap();
+            if (checkResponse(response)) {
+                return response.readEntity(UsersListResponse.class).getValue().stream().findFirst().orElse(EMPTY_BEAN_RESPONSE);
+            }
+            if(response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                return EMPTY_BEAN_RESPONSE;
+            }
+            throw new LscServiceException(response.readEntity(String.class));
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+
+    }
+
+    private Map<String, Object> getStringObjectImmutableMap() {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put(pivot, null);
+        return map;
+    }
 }
