@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns="http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd" targetNamespace="http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd"
+	elementFormDefault="qualified" xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+	xmlns:lsc="http://lsc-project.org/XSD/lsc-core-2.1.xsd" jaxb:version="2.0">
+
+	<xsd:import namespace="http://lsc-project.org/XSD/lsc-core-2.1.xsd" schemaLocation="lsc-core-2.1.xsd" />
+
+	<xsd:complexType name="msGraphApiConnectionType">
+		<xsd:complexContent>
+			<xsd:extension base="lsc:connectionType">
+				<xsd:sequence>
+					<xsd:element name="clientId" type="xsd:string" />
+					<xsd:element name="clientSecret" type="xsd:string" />
+					<xsd:element name="tenant" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:complexType name="msGraphApiService" abstract="true">
+		<xsd:complexContent>
+			<xsd:extension base="lsc:serviceType">
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+
+	<xsd:element name="msGraphApiUsersService">
+		<xsd:complexType>
+			<xsd:complexContent>
+				<xsd:extension base="msGraphApiService">
+					<xsd:sequence>
+						<xsd:element name="filter" type="xsd:string" minOccurs="0" />
+					</xsd:sequence>
+				</xsd:extension>
+			</xsd:complexContent>
+		</xsd:complexType>
+	</xsd:element>
+</xsd:schema>
