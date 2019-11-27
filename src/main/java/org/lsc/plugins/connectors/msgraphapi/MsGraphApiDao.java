@@ -47,17 +47,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
 import org.glassfish.jersey.jackson.JacksonFeature;
+import org.lsc.exception.LscServiceException;
 import org.lsc.plugins.connectors.msgraphapi.beans.User;
 import org.lsc.plugins.connectors.msgraphapi.beans.UsersListResponse;
 import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiUsersService;
@@ -69,6 +69,7 @@ public class MsGraphApiDao {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(MsGraphApiDao.class);
     private final Client client;
+    private final Optional<Integer> pageSize;
 
     private WebTarget usersClient;
 
@@ -78,6 +79,7 @@ public class MsGraphApiDao {
     public MsGraphApiDao(String token, MsGraphApiUsersService serviceConfiguration) {
         authorizationBearer = "Bearer " + token;
         this.filter = Optional.ofNullable(serviceConfiguration.getFilter()).filter(filter -> !filter.trim().isEmpty());
+        this.pageSize = Optional.ofNullable(serviceConfiguration.getPageSize()).filter(size -> size > 0);
         LOGGER.debug("bearer " + authorizationBearer);
         client = ClientBuilder.newClient()
             .register(JacksonFeature.class);
@@ -87,13 +89,15 @@ public class MsGraphApiDao {
             .path(USER_PATH);
     }
 
-    public List<User> getUsersList() {
+    public List<User> getUsersList() throws LscServiceException {
         WebTarget target = usersClient.queryParam("$select", "mail");
 
         if (filter.isPresent()) {
             target = target.queryParam("$filter", filter.get());
         }
-        LOGGER.debug("GETting users list: " + target.getUri().toString());
+        if (pageSize.isPresent()) {
+            target = target.queryParam("$top", pageSize.get());
+        }
         UsersListResponse users = getUsersListResponse(target);
 
         List<UsersListResponse> usersResponsesPages = new ArrayList<>();
@@ -115,10 +119,30 @@ public class MsGraphApiDao {
 
     }
 
-    private UsersListResponse getUsersListResponse(WebTarget target) {
-        return target.request()
-            .header(HttpHeaders.AUTHORIZATION, authorizationBearer)
-            .accept(MediaType.APPLICATION_JSON_TYPE)
-            .get(UsersListResponse.class);
+    private UsersListResponse getUsersListResponse(WebTarget target) throws LscServiceException {
+        LOGGER.debug("GETting users list or following page: " + target.getUri().toString());
+
+        Response response = null;
+        try {
+            response = target.request()
+                .header(HttpHeaders.AUTHORIZATION, authorizationBearer)
+                .accept(MediaType.APPLICATION_JSON_TYPE)
+                .get();
+            if (checkResponse(response)) {
+                return response.readEntity(UsersListResponse.class);
+            }
+            throw new LscServiceException(response.readEntity(String.class));
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+        }
+
+
     }
+
+    private static boolean checkResponse(Response response) {
+        return Response.Status.Family.familyOf(response.getStatus()) == Response.Status.Family.SUCCESSFUL;
+    }
+
 }

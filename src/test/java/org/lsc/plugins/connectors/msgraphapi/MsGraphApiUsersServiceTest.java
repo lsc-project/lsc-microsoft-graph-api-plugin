@@ -43,10 +43,10 @@
 package org.lsc.plugins.connectors.msgraphapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.EnumSet;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -68,7 +68,8 @@ class MsGraphApiUsersServiceTest {
     private MsGraphApiUsersService usersService;
     private static PluginSourceServiceType pluginSourceService;
     private static ServiceType.Connection connection;
-    private static final int DEFAULT_PAGE_SIZE = 100;
+    private static int DEFAULT_PAGE_SIZE = 100;
+    private static int PAGE_SIZE = 300;
 
     @BeforeAll
     static void setup() throws AuthorizationException {
@@ -120,6 +121,14 @@ class MsGraphApiUsersServiceTest {
 
     @Test
     void listPivotShouldReturnAllResultsWhenMoreThanOnePage() throws LscServiceException {
+        when(usersService.getPageSize()).thenReturn(PAGE_SIZE);
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+        Map<String, LscDatasets> listPivots = testee.getListPivots();
+        assertThat(listPivots.keySet().size()).isGreaterThan(PAGE_SIZE);
+    }
+
+    @Test
+    void listPivotShouldReturnAllResultsWhenMoreThanOnePageWithDefaultPagination() throws LscServiceException {
         MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
         Map<String, LscDatasets> listPivots = testee.getListPivots();
         assertThat(listPivots.keySet().size()).isGreaterThan(DEFAULT_PAGE_SIZE);
@@ -127,10 +136,17 @@ class MsGraphApiUsersServiceTest {
 
     @Test
     void listPivotShouldReturnAllResultsWhenMoreThanThreePages() throws LscServiceException {
+        when(usersService.getPageSize()).thenReturn(PAGE_SIZE);
         MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
         Map<String, LscDatasets> listPivots = testee.getListPivots();
-        assertThat(listPivots.keySet().size()).isGreaterThan(3 * DEFAULT_PAGE_SIZE);
+        assertThat(listPivots.keySet().size()).isGreaterThan(3 * PAGE_SIZE);
     }
 
+    @Test
+    void listPivotShouldThrowsWhenInvalidPageSize() throws LscServiceException {
+        when(usersService.getPageSize()).thenReturn(1000);
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+        assertThatThrownBy(testee::getListPivots).isInstanceOf(LscServiceException.class);
+    }
 
 }
