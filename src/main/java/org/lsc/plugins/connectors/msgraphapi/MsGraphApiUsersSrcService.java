@@ -42,6 +42,8 @@
  */
 package org.lsc.plugins.connectors.msgraphapi;
 
+import static org.lsc.plugins.connectors.msgraphapi.MsGraphApiDao.ID;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -106,13 +108,13 @@ public class MsGraphApiUsersSrcService implements IService {
         }
         String pivotAttribute = pivotAttributes.getAttributesNames().get(0);
         String pivotValue = pivotAttributes.getStringValueAttribute(pivotAttribute);
-        String idValue = pivotAttributes.getStringValueAttribute("id");
+        String idValue = pivotAttributes.getStringValueAttribute(ID);
         if (idValue == null) {
             return null;
         }
         try {
             Map<String, Object> user = dao.getUserDetails(idValue);
-            return mapToBean(pivotAttribute, user);
+            return mapToBean(idValue, user);
         } catch (ProcessingException e) {
             LOGGER.error(String.format("ProcessingException while getting bean %s/%s with id %s (%s)",
                 pivoteAttributeName, pivotValue, idValue, e));
@@ -133,14 +135,10 @@ public class MsGraphApiUsersSrcService implements IService {
         }
     }
 
-    private IBean mapToBean(String pivotName, Map<String, Object> user) throws InstantiationException, IllegalAccessException {
+    private IBean mapToBean(String idValue, Map<String, Object> user) throws InstantiationException, IllegalAccessException {
         IBean bean = beanClass.newInstance();
-        Object userValue = user.get(pivotName);
-        if(userValue == null) {
-            return null;
-        }
 
-        bean.setMainIdentifier(userValue.toString());
+        bean.setMainIdentifier(idValue);
         //TODO Fix me
         bean.setDatasets(new LscDatasets(user));
         return bean;

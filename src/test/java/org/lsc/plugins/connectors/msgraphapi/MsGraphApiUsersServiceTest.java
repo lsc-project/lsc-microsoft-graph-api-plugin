@@ -195,15 +195,26 @@ class MsGraphApiUsersServiceTest {
     }
 
     @Test
-    public void getBeanShouldReturnMainIdentifierSetToMail() throws Exception {
+    public void getBeanShouldReturnMainIdentifierSetToIdWhenDefaultPivot() throws Exception {
         MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
 
         Map<String, LscDatasets> pivots = testee.getListPivots();
         String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
         IBean bean = testee.getBean("mail", pivots.get(firstUserPivotValue), FROM_SAME_SERVICE);
 
-        assertThat(bean.getMainIdentifier()).isEqualTo(firstUserPivotValue);
+        assertThat(bean.getMainIdentifier()).isEqualTo(pivots.get(firstUserPivotValue).getStringValueAttribute("id"));
+    }
 
+    @Test
+    public void getBeanShouldReturnMainIdentifierSetToIdWhenMailAsPivot() throws Exception {
+        when(usersService.getPivot()).thenReturn("mail");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        IBean bean = testee.getBean("mail", pivots.get(firstUserPivotValue), FROM_SAME_SERVICE);
+
+        assertThat(bean.getMainIdentifier()).isEqualTo(pivots.get(firstUserPivotValue).getStringValueAttribute("id"));
     }
 
     @Test
@@ -215,7 +226,6 @@ class MsGraphApiUsersServiceTest {
         String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
         IBean bean = testee.getBean("id", pivots.get(firstUserPivotValue), FROM_SAME_SERVICE);
 
-        assertThat(bean.getMainIdentifier()).isEqualTo(firstUserPivotValue);
-
+        assertThat(bean.getMainIdentifier()).isEqualTo(pivots.get(firstUserPivotValue).getStringValueAttribute("id"));
     }
 }
