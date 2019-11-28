@@ -46,18 +46,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.lang.StringUtils;
+import org.codehaus.jackson.map.type.MapType;
+import org.codehaus.jackson.type.TypeReference;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.lsc.exception.LscServiceException;
 import org.lsc.plugins.connectors.msgraphapi.beans.User;
@@ -65,8 +67,6 @@ import org.lsc.plugins.connectors.msgraphapi.beans.UsersListResponse;
 import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiUsersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ImmutableMap;
 
 public class MsGraphApiDao {
     public static final String USER_PATH = "/users";
@@ -100,7 +100,8 @@ public class MsGraphApiDao {
     }
 
     public List<User> getUsersList() throws LscServiceException {
-        WebTarget target = usersClient.queryParam("$select", pivot);
+
+        WebTarget target = pivot.equals("id") ? usersClient.queryParam("$select", pivot) : usersClient.queryParam("$select","id," + pivot);
 
         if (filter.isPresent()) {
             target = target.queryParam("$filter", filter.get());
@@ -123,9 +124,8 @@ public class MsGraphApiDao {
         return usersResponsesPages
             .stream()
             .flatMap(response -> response.getValue().stream())
-            .map(map -> map.get(pivot))
-            .filter(Objects::nonNull)
-            .map(pivotValue -> new User(pivot, pivotValue.toString())).collect(Collectors.toList());
+            .filter(map -> map.get("id") !=null && map.get(pivot) != null)
+            .map(map -> new User(pivot, map.get(pivot).toString(), map.get("id").toString())).collect(Collectors.toList());
     }
 
     private UsersListResponse getUsersListResponse(WebTarget target) throws LscServiceException {
@@ -152,14 +152,11 @@ public class MsGraphApiDao {
         return Response.Status.Family.familyOf(response.getStatus()) == Response.Status.Family.SUCCESSFUL;
     }
 
-    public Map<String, Object> getUserDetails(String pivotValue) throws LscServiceException {
+    public Map<String, Object> getUserDetails(String id) throws LscServiceException {
 
         Response response = null;
         try {
-            String pivotFilter = pivot + " eq '" + pivotValue + "'";
-            WebTarget target = filter
-                .map(filter -> usersClient.queryParam("$filter", "(" + filter + ") and " + pivotFilter))
-                .orElseGet(() -> usersClient.queryParam("$filter", pivotFilter));
+            WebTarget target = usersClient.path(id);
 
             LOGGER.debug("GETting users detail : " + target.getUri().toString());
 
@@ -170,7 +167,7 @@ public class MsGraphApiDao {
                 .get();
             Map<String, Object> EMPTY_BEAN_RESPONSE = getStringObjectImmutableMap();
             if (checkResponse(response)) {
-                return response.readEntity(UsersListResponse.class).getValue().stream().findFirst().orElse(EMPTY_BEAN_RESPONSE);
+                return response.readEntity(new GenericType<>(new TypeReference<Map<String, Object>>() {}.getType()));
             }
             if(response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 return EMPTY_BEAN_RESPONSE;

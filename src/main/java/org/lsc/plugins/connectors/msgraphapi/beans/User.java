@@ -48,15 +48,18 @@ public class User {
 
 	private final String pivotAttribute;
 	private final String value;
+	private final String id;
 
-	public User(String pivotAttribute, String value) {
+	public User(String pivotAttribute, String value, String id) {
 		this.pivotAttribute = pivotAttribute;
 		this.value = value;
+		this.id = id;
 	}
 
 	public LscDatasets toDatasets() {
 		LscDatasets datasets = new LscDatasets();
 		datasets.put(pivotAttribute, value);
+		datasets.put("id", id);
 		return datasets;
 	}
 
@@ -66,5 +69,9 @@ public class User {
 
 	public String getValue() {
 		return value;
+	}
+
+	public String getId() {
+		return id;
 	}
 }
