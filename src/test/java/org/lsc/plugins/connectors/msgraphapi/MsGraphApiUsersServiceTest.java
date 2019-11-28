@@ -49,6 +49,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Map;
 
+import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -169,14 +170,14 @@ class MsGraphApiUsersServiceTest {
     }
 
     @Test
-    public void getBeanShouldReturnNullWhenEmptyDataset() throws Exception {
+    void getBeanShouldReturnNullWhenEmptyDataset() throws Exception {
         MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
 
         assertThat(testee.getBean("id", new LscDatasets(), FROM_SAME_SERVICE)).isNull();
     }
 
     @Test
-    public void getBeanShouldReturnNullWhenNoMatchingMail() throws Exception {
+    void getBeanShouldReturnNullWhenNoMatchingMail() throws Exception {
         MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
 
         LscDatasets nonExistingIdDataset = new LscDatasets(ImmutableMap.of("mail", "502e48b1-40e7-4c6c-91ec-13a51b679849"));
@@ -185,7 +186,7 @@ class MsGraphApiUsersServiceTest {
     }
 
     @Test
-    public void getBeanShouldReturnNullWhenNoMatchingId() throws Exception {
+    void getBeanShouldReturnNullWhenNoMatchingId() throws Exception {
         when(usersService.getPivot()).thenReturn("id");
         MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
 
@@ -195,7 +196,7 @@ class MsGraphApiUsersServiceTest {
     }
 
     @Test
-    public void getBeanShouldReturnMainIdentifierSetToIdWhenDefaultPivot() throws Exception {
+    void getBeanShouldReturnMainIdentifierSetToIdWhenDefaultPivot() throws Exception {
         MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
 
         Map<String, LscDatasets> pivots = testee.getListPivots();
@@ -206,7 +207,7 @@ class MsGraphApiUsersServiceTest {
     }
 
     @Test
-    public void getBeanShouldReturnMainIdentifierSetToIdWhenMailAsPivot() throws Exception {
+    void getBeanShouldReturnMainIdentifierSetToIdWhenMailAsPivot() throws Exception {
         when(usersService.getPivot()).thenReturn("mail");
         MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
 
@@ -218,7 +219,7 @@ class MsGraphApiUsersServiceTest {
     }
 
     @Test
-    public void getBeanShouldReturnMainIdentifierSetToIdWhenIdAsAPivot() throws Exception {
+    void getBeanShouldReturnMainIdentifierSetToIdWhenIdAsAPivot() throws Exception {
         when(usersService.getPivot()).thenReturn("id");
         MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
 
@@ -227,5 +228,81 @@ class MsGraphApiUsersServiceTest {
         IBean bean = testee.getBean("id", pivots.get(firstUserPivotValue), FROM_SAME_SERVICE);
 
         assertThat(bean.getMainIdentifier()).isEqualTo(pivots.get(firstUserPivotValue).getStringValueAttribute("id"));
+    }
+
+    @Test
+    void getBeanShouldReturnIdAndMail() throws Exception {
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        IBean bean = testee.getBean("mail", pivots.get(firstUserPivotValue), FROM_SAME_SERVICE);
+
+        assertThat(bean.getDatasetFirstValueById("id")).isEqualTo(pivots.get(firstUserPivotValue).getStringValueAttribute("id"));
+        assertThat(bean.getDatasetFirstValueById("mail")).isEqualTo(pivots.get(firstUserPivotValue).getStringValueAttribute("mail"));
+    }
+
+    @Test
+    void getBeanShouldReturnIdAndMailWhenMailPivot() throws Exception {
+        when(usersService.getPivot()).thenReturn("mail");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        IBean bean = testee.getBean("mail", pivots.get(firstUserPivotValue), FROM_SAME_SERVICE);
+
+        assertThat(bean.getDatasetFirstValueById("id")).isEqualTo(pivots.get(firstUserPivotValue).getStringValueAttribute("id"));
+        assertThat(bean.getDatasetFirstValueById("mail")).isEqualTo(pivots.get(firstUserPivotValue).getStringValueAttribute("mail"));
+    }
+
+    @Test
+    void getBeanShouldReturnIdAndMailWhenIdPivot() throws Exception {
+        when(usersService.getPivot()).thenReturn("id");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        IBean bean = testee.getBean("id", pivots.get(firstUserPivotValue), FROM_SAME_SERVICE);
+
+        assertThat(bean.getDatasetFirstValueById("id")).isEqualTo(pivots.get(firstUserPivotValue).getStringValueAttribute("id"));
+        assertThat(bean.getDatasetFirstValueById("mail")).isNotBlank();
+    }
+
+    @Test
+    void getBeanShouldReturnBusinessPhonesAsACollection() throws Exception {
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        IBean bean = testee.getBean("mail", pivots.get(firstUserPivotValue), FROM_SAME_SERVICE);
+
+        assertThat(bean.getDatasetById("businessPhones")).isEmpty();
+    }
+
+    @Test
+    void mapToBeanShouldPreserveEmptyArray() throws Exception{
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        IBean bean = testee.mapToBean("id", ImmutableMap.of("businessPhones", ImmutableList.of()));
+
+        assertThat(bean.getDatasetById("businessPhones")).isEmpty();
+    }
+
+    @Test
+    void mapToBeanShouldPreserveTwoValues() throws Exception{
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        IBean bean = testee.mapToBean("id", ImmutableMap.of("businessPhones", ImmutableList.of("123", "456")));
+
+        assertThat(bean.getDatasetById("businessPhones")).hasSize(2);
+    }
+
+    @Test
+    void mapToBeanShouldPreserveNull() throws Exception{
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        IBean bean = testee.mapToBean("id", Maps.newHashMap("givenName", null));
+
+        assertThat(bean.getDatasetById("givenName")).isNull();
     }
 }

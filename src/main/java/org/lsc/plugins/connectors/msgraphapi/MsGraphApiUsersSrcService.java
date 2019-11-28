@@ -65,6 +65,7 @@ import org.lsc.service.IService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 
 public class MsGraphApiUsersSrcService implements IService {
@@ -135,11 +136,11 @@ public class MsGraphApiUsersSrcService implements IService {
         }
     }
 
-    private IBean mapToBean(String idValue, Map<String, Object> user) throws InstantiationException, IllegalAccessException {
+    @VisibleForTesting
+    IBean mapToBean(String idValue, Map<String, Object> user) throws InstantiationException, IllegalAccessException {
         IBean bean = beanClass.newInstance();
 
         bean.setMainIdentifier(idValue);
-        //TODO Fix me
         bean.setDatasets(new LscDatasets(user));
         return bean;
     }
