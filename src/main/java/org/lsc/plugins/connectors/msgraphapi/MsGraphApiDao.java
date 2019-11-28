@@ -69,22 +69,23 @@ import org.slf4j.LoggerFactory;
 
 public class MsGraphApiDao {
     public static final String USER_PATH = "/users";
-
-    protected static final Logger LOGGER = LoggerFactory.getLogger(MsGraphApiDao.class);
     public static final String DEFAULT_PIVOT = "mail";
     public static final String ID = "id";
+    private static final Logger LOGGER = LoggerFactory.getLogger(MsGraphApiDao.class);
+
     private final Client client;
+    private WebTarget usersClient;
+    private final String authorizationBearer;
+
     private final Optional<Integer> pageSize;
     private final String pivot;
-
-    private WebTarget usersClient;
-
-    private final String authorizationBearer;
     private final Optional<String> filter;
+    private final Optional<String> select;
 
     public MsGraphApiDao(String token, MsGraphApiUsersService serviceConfiguration) {
         authorizationBearer = "Bearer " + token;
         this.filter = getStringParameter(serviceConfiguration.getFilter());
+        this.select = getStringParameter(serviceConfiguration.getSelect());
         this.pivot = getStringParameter(serviceConfiguration.getPivot()).orElse(DEFAULT_PIVOT);
         this.pageSize = Optional.ofNullable(serviceConfiguration.getPageSize()).filter(size -> size > 0);
         LOGGER.debug("bearer " + authorizationBearer);
@@ -158,7 +159,9 @@ public class MsGraphApiDao {
         Response response = null;
         try {
             WebTarget target = usersClient.path(id);
-
+            if (select.isPresent()) {
+                target = target.queryParam("$select", select.get());
+            }
             LOGGER.debug("GETting users detail : " + target.getUri().toString());
 
             response = target

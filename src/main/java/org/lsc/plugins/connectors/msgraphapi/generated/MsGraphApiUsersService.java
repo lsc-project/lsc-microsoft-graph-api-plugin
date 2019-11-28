@@ -2,7 +2,7 @@
 // Ce fichier a été généré par l'implémentation de référence JavaTM Architecture for XML Binding (JAXB), v2.2.8-b130911.1802 
 // Voir <a href="http://java.sun.com/xml/jaxb">http://java.sun.com/xml/jaxb</a> 
 // Toute modification apportée à ce fichier sera perdue lors de la recompilation du schéma source. 
-// Généré le : 2019.11.27 à 03:09:52 PM CET 
+// Généré le : 2019.11.28 à 02:57:09 PM CET 
 //
 
 
@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="filter" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="pivot" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;element name="pageSize" type="{http://www.w3.org/2001/XMLSchema}int" minOccurs="0"/>
+ *         &lt;element name="select" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>
@@ -40,7 +41,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "", propOrder = {
     "filter",
     "pivot",
-    "pageSize"
+    "pageSize",
+    "select"
 })
 @XmlRootElement(name = "msGraphApiUsersService", namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd")
 public class MsGraphApiUsersService
@@ -53,6 +55,8 @@ public class MsGraphApiUsersService
     protected String pivot;
     @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd")
     protected Integer pageSize;
+    @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd")
+    protected String select;
 
     /**
      * Obtient la valeur de la propriété filter.
@@ -124,6 +128,30 @@ public class MsGraphApiUsersService
      */
     public void setPageSize(Integer value) {
         this.pageSize = value;
+    }
+
+    /**
+     * Obtient la valeur de la propriété select.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getSelect() {
+        return select;
+    }
+
+    /**
+     * Définit la valeur de la propriété select.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setSelect(String value) {
+        this.select = value;
     }
 
 }

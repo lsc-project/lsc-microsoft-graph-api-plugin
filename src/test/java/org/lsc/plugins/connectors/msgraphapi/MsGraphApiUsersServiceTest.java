@@ -305,4 +305,30 @@ class MsGraphApiUsersServiceTest {
 
         assertThat(bean.getDatasetById("givenName")).isNull();
     }
+
+    @Test
+    void getBeanShouldNotReturnIdWhenSelectDoesntContainIdField() throws Exception {
+        when(usersService.getSelect()).thenReturn("mail,mobilePhone");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        IBean bean = testee.getBean("mail", pivots.get(firstUserPivotValue), FROM_SAME_SERVICE);
+
+        assertThat(bean.getDatasetById("id")).isNull();
+        assertThat(bean.getDatasetFirstValueById("mail")).isEqualTo(firstUserPivotValue);
+    }
+
+    @Test
+    void getBeanShouldReturnIdAndUserPrincipalNameWhenSelectContainsThem() throws Exception {
+        when(usersService.getSelect()).thenReturn("id,userPrincipalName");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        IBean bean = testee.getBean("mail", pivots.get(firstUserPivotValue), FROM_SAME_SERVICE);
+
+        assertThat(bean.getDatasetFirstValueById("id")).isNotBlank();
+        assertThat(bean.getDatasetFirstValueById("userPrincipalName")).isNotBlank();
+    }
 }
