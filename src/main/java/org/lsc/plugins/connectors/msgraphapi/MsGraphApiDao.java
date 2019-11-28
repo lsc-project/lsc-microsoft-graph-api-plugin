@@ -126,8 +126,16 @@ public class MsGraphApiDao {
         return usersResponsesPages
             .stream()
             .flatMap(response -> response.getValue().stream())
-            .filter(map -> map.get(ID) !=null && map.get(pivot) != null)
+            .filter(this::hasPivots)
             .map(map -> new User(pivot, map.get(pivot).toString(), map.get(ID).toString())).collect(Collectors.toList());
+    }
+
+    private boolean hasPivots(Map<String, Object> map) {
+        if (map.get(ID) == null || map.get(pivot) == null) {
+            LOGGER.warn("The entry " + map.toString() + " has no pivot '" + pivot + "' or id and has been ignored.");
+            return false;
+        }
+        return true;
     }
 
     private UsersListResponse getUsersListResponse(WebTarget target) throws LscServiceException {
