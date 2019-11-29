@@ -44,6 +44,7 @@ package org.lsc.plugins.connectors.msgraphapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,9 +54,9 @@ import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.StringUtils;
 import org.lsc.LscDatasets;
 import org.lsc.beans.IBean;
-import org.lsc.configuration.ConnectionType;
 import org.lsc.configuration.PluginConnectionType;
 import org.lsc.configuration.PluginSourceServiceType;
 import org.lsc.configuration.ServiceType;
@@ -79,6 +80,14 @@ class MsGraphApiUsersServiceTest {
 
     @BeforeAll
     static void setup() throws AuthorizationException {
+        String clientId = System.getenv("TEST_MS_GRAPH_API_CLIENT_ID");
+        String clientSecret = System.getenv("TEST_MS_GRAPH_API_CLIENT_SECRET");
+        String tenant = System.getenv("TEST_MS_GRAPH_API_TENANT");
+
+        assumeTrue(StringUtils.isNotBlank(clientId));
+        assumeTrue(StringUtils.isNotBlank(clientSecret));
+        assumeTrue(StringUtils.isNotBlank(tenant));
+
         pluginSourceService = mock(PluginSourceServiceType.class);
         connectionSettings = mock(MsGraphApiConnectionSettings.class);
         task = mock(TaskType.class);
@@ -88,9 +97,9 @@ class MsGraphApiUsersServiceTest {
         when(connectionType.getAny()).thenReturn(ImmutableList.of(connectionSettings));
         when(connection.getReference()).thenReturn(connectionType);
         when(pluginSourceService.getConnection()).thenReturn(connection);
-        when(connectionSettings.getClientId()).thenReturn(System.getenv("TEST_MS_GRAPH_API_CLIENT_ID"));
-        when(connectionSettings.getClientSecret()).thenReturn(System.getenv("TEST_MS_GRAPH_API_CLIENT_SECRET"));
-        when(connectionSettings.getTenant()).thenReturn(System.getenv("TEST_MS_GRAPH_API_TENANT"));
+        when(connectionSettings.getClientId()).thenReturn(clientId);
+        when(connectionSettings.getClientSecret()).thenReturn(clientSecret);
+        when(connectionSettings.getTenant()).thenReturn(tenant);
         when(task.getBean()).thenReturn("org.lsc.beans.SimpleBean");
         when(task.getPluginSourceService()).thenReturn(pluginSourceService);
     }

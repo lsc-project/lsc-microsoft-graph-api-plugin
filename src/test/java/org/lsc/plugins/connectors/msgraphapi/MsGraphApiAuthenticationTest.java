@@ -45,8 +45,11 @@ package org.lsc.plugins.connectors.msgraphapi;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.platform.commons.util.StringUtils;
 import org.lsc.plugins.connectors.msgraphapi.beans.AuthenticationResponse;
 
 import com.auth0.jwt.JWT;
@@ -61,6 +64,13 @@ class MsGraphApiAuthenticationTest {
 
     MsGraphApiAuthenticationTest() {
         msGraphApiAuthentication = new MsGraphApiAuthentication();
+    }
+
+    @BeforeAll
+    static void setup() {
+        assumeTrue(StringUtils.isNotBlank(CLIENT_ID));
+        assumeTrue(StringUtils.isNotBlank(CLIENT_SECRET));
+        assumeTrue(StringUtils.isNotBlank(TENANT));
     }
 
     @Test
