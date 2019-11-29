@@ -54,12 +54,13 @@ import javax.ws.rs.WebApplicationException;
 
 import org.lsc.LscDatasets;
 import org.lsc.beans.IBean;
+import org.lsc.configuration.PluginConnectionType;
 import org.lsc.configuration.TaskType;
 import org.lsc.exception.LscServiceCommunicationException;
 import org.lsc.exception.LscServiceConfigurationException;
 import org.lsc.exception.LscServiceException;
 import org.lsc.plugins.connectors.msgraphapi.beans.User;
-import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiConnectionType;
+import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiConnectionSettings;
 import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiUsersService;
 import org.lsc.service.IService;
 import org.slf4j.Logger;
@@ -78,20 +79,27 @@ public class MsGraphApiUsersSrcService implements IService {
 
     private final MsGraphApiUsersService service;
     private final MsGraphApiDao dao;
-    private final MsGraphApiConnectionType connection;
+    private final MsGraphApiConnectionSettings settings;
 
     public MsGraphApiUsersSrcService(TaskType task) throws LscServiceConfigurationException {
         try {
             if (task.getPluginSourceService().getAny() == null || task.getPluginSourceService().getAny().size() != 1 || !((task.getPluginSourceService().getAny().get(0) instanceof MsGraphApiUsersService))) {
-                throw new LscServiceConfigurationException("Unable to identify the James service configuration " + "inside the plugin source node of the task: " + task.getName());
+                throw new LscServiceConfigurationException("Unable to identify the msgraphapi service configuration " + "inside the plugin source node of the task: " + task.getName());
             }
 
             service = (MsGraphApiUsersService) task.getPluginSourceService().getAny().get(0);
             beanClass = (Class<IBean>) Class.forName(task.getBean());
-            connection = (MsGraphApiConnectionType) service.getConnection().getReference();
+            if (task.getPluginSourceService().getConnection() == null || task.getPluginSourceService().getConnection().getReference() == null || ! (task.getPluginSourceService().getConnection().getReference() instanceof PluginConnectionType)) {
+                throw new LscServiceConfigurationException("Unable to identify the msgraphapi service connection " + "inside the plugin source node of the task: " + task.getName());
+            }
+            PluginConnectionType pluginConnectionType = (PluginConnectionType)task.getPluginSourceService().getConnection().getReference();
+            if (pluginConnectionType.getAny() == null || pluginConnectionType.getAny().size() != 1 || !(pluginConnectionType.getAny().get(0) instanceof MsGraphApiConnectionSettings)) {
+                throw new LscServiceConfigurationException("Unable to identify the msgraphapi connection settings " + "inside the connection node of the task: " + task.getName());
+            }
+            settings = (MsGraphApiConnectionSettings) pluginConnectionType.getAny().get(0);
 
             String token = new MsGraphApiAuthentication()
-                .authenticate(connection.getTenant(), connection.getClientId(), connection.getClientSecret())
+                .authenticate(settings.getTenant(), settings.getClientId(), settings.getClientSecret())
                 .getAccessToken();
 
             dao = new MsGraphApiDao(token, service);

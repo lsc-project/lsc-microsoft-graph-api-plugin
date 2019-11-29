@@ -55,11 +55,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.lsc.LscDatasets;
 import org.lsc.beans.IBean;
+import org.lsc.configuration.ConnectionType;
+import org.lsc.configuration.PluginConnectionType;
 import org.lsc.configuration.PluginSourceServiceType;
 import org.lsc.configuration.ServiceType;
 import org.lsc.configuration.TaskType;
 import org.lsc.exception.LscServiceException;
-import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiConnectionType;
+import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiConnectionSettings;
 import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiUsersService;
 
 import com.google.common.collect.ImmutableList;
@@ -71,23 +73,24 @@ class MsGraphApiUsersServiceTest {
     private static TaskType task;
     private MsGraphApiUsersService usersService;
     private static PluginSourceServiceType pluginSourceService;
-    private static ServiceType.Connection connection;
     private static int DEFAULT_PAGE_SIZE = 100;
     private static int PAGE_SIZE = 300;
+    private static MsGraphApiConnectionSettings connectionSettings;
 
     @BeforeAll
     static void setup() throws AuthorizationException {
-        MsGraphApiAuthentication msGraphApiAuthentication = new MsGraphApiAuthentication();
-
         pluginSourceService = mock(PluginSourceServiceType.class);
-        MsGraphApiConnectionType pluginConnection = mock(MsGraphApiConnectionType.class);
-        connection = mock(ServiceType.Connection.class);
+        connectionSettings = mock(MsGraphApiConnectionSettings.class);
         task = mock(TaskType.class);
+        PluginConnectionType connectionType = mock(PluginConnectionType.class);
+        ServiceType.Connection connection = mock(ServiceType.Connection.class);
 
-        when(pluginConnection.getClientId()).thenReturn(System.getenv("TEST_MS_GRAPH_API_CLIENT_ID"));
-        when(pluginConnection.getClientSecret()).thenReturn(System.getenv("TEST_MS_GRAPH_API_CLIENT_SECRET"));
-        when(pluginConnection.getTenant()).thenReturn(System.getenv("TEST_MS_GRAPH_API_TENANT"));
-        when(connection.getReference()).thenReturn(pluginConnection);
+        when(connectionType.getAny()).thenReturn(ImmutableList.of(connectionSettings));
+        when(connection.getReference()).thenReturn(connectionType);
+        when(pluginSourceService.getConnection()).thenReturn(connection);
+        when(connectionSettings.getClientId()).thenReturn(System.getenv("TEST_MS_GRAPH_API_CLIENT_ID"));
+        when(connectionSettings.getClientSecret()).thenReturn(System.getenv("TEST_MS_GRAPH_API_CLIENT_SECRET"));
+        when(connectionSettings.getTenant()).thenReturn(System.getenv("TEST_MS_GRAPH_API_TENANT"));
         when(task.getBean()).thenReturn("org.lsc.beans.SimpleBean");
         when(task.getPluginSourceService()).thenReturn(pluginSourceService);
     }
@@ -95,7 +98,6 @@ class MsGraphApiUsersServiceTest {
     @BeforeEach
     void defineService() {
         usersService = mock(MsGraphApiUsersService.class);
-        when(usersService.getConnection()).thenReturn(connection);
         when(pluginSourceService.getAny()).thenReturn(ImmutableList.of(usersService));
     }
 
