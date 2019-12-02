@@ -102,11 +102,14 @@ public class MsGraphApiDao {
     }
 
     public List<User> getUsersList() throws LscServiceException {
+        return getUsersList(filter);
+    }
 
+    private List<User> getUsersList(Optional<String> computedFilter) throws LscServiceException {
         WebTarget target = pivot.equals(ID) ? usersClient.queryParam("$select", pivot) : usersClient.queryParam("$select","id," + pivot);
 
-        if (filter.isPresent()) {
-            target = target.queryParam("$filter", filter.get());
+        if (computedFilter.isPresent()) {
+            target = target.queryParam("$filter", computedFilter.get());
         }
         if (pageSize.isPresent()) {
             target = target.queryParam("$top", pageSize.get());
@@ -150,6 +153,9 @@ public class MsGraphApiDao {
             if (checkResponse(response)) {
                 return response.readEntity(UsersListResponse.class);
             }
+            if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+                throw new NotFoundException("Not found when requesting " + target.getUri());
+            }
             throw new LscServiceException(response.readEntity(String.class));
         } finally {
             if (response != null) {
@@ -192,4 +198,12 @@ public class MsGraphApiDao {
 
     }
 
+    public Optional<User> getFirstUserWithId(String pivotValue) throws LscServiceException {
+        String pivotFilter = pivot + " eq '" + pivotValue + "'";
+        String computedFilter = filter.map(f -> "(" + f + ")" + " and " + pivotFilter)
+            .orElse(pivotFilter);
+        return getUsersList(Optional.of(computedFilter))
+            .stream()
+            .findFirst();
+    }
 }

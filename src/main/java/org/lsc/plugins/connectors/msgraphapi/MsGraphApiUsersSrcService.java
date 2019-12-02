@@ -47,6 +47,7 @@ import static org.lsc.plugins.connectors.msgraphapi.MsGraphApiDao.ID;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
@@ -110,13 +111,49 @@ public class MsGraphApiUsersSrcService implements IService {
     }
 
     @Override
-    public IBean getBean(String pivoteAttributeName, LscDatasets pivotAttributes, boolean fromSameService) throws LscServiceException {
-        LOGGER.debug(String.format("Call to getBean(%s, %s, %b)", pivoteAttributeName, pivotAttributes, fromSameService));
+    public IBean getBean(String pivotAttributeName, LscDatasets pivotAttributes, boolean fromSameService) throws LscServiceException {
+        LOGGER.debug(String.format("Call to getBean(%s, %s, %b)", pivotAttributeName, pivotAttributes, fromSameService));
         if (pivotAttributes.getAttributesNames().size() < 1) {
             return null;
         }
         String pivotAttribute = pivotAttributes.getAttributesNames().get(0);
         String pivotValue = pivotAttributes.getStringValueAttribute(pivotAttribute);
+        if (fromSameService) {
+            return getBeanFromSameService(pivotAttributeName, pivotAttributes, pivotValue);
+        } else {
+            return getBeanForClean(pivotAttributeName, pivotValue);
+        }
+    }
+
+    private IBean getBeanForClean(String pivotAttributeName, String pivotValue) throws LscServiceException {
+        try {
+            Optional<User> maybeUser = dao.getFirstUserWithId(pivotValue);
+            if (maybeUser.isPresent()) {
+                return userIdToBean(maybeUser.get().getId());
+            } else {
+                return null;
+            }
+        } catch (ProcessingException e) {
+            LOGGER.error(String.format("ProcessingException while getting bean %s/%s (%s)",
+                pivotAttributeName, pivotValue, e));
+            LOGGER.error(e.toString(), e);
+            throw new LscServiceCommunicationException(e);
+        } catch (NotFoundException e) {
+            LOGGER.debug(String.format("%s/%s not found", pivotAttributeName, pivotValue));
+            return null;
+        } catch (WebApplicationException e) {
+            LOGGER.error(String.format("WebApplicationException while getting bean %s/%s (%s)",
+                pivotAttributeName, pivotValue, e));
+            LOGGER.debug(e.toString(), e);
+            throw new LscServiceException(e);
+        } catch (InstantiationException | IllegalAccessException e) {
+            LOGGER.error("Bad class name: " + beanClass.getName() + "(" + e + ")");
+            LOGGER.debug(e.toString(), e);
+            throw new LscServiceException(e);
+        }
+    }
+
+    private IBean getBeanFromSameService(String pivotAttributeName, LscDatasets pivotAttributes, String pivotValue) throws LscServiceException {
         String idValue = pivotAttributes.getStringValueAttribute(ID);
         if (idValue == null) {
             return null;
@@ -126,15 +163,15 @@ public class MsGraphApiUsersSrcService implements IService {
             return mapToBean(idValue, user);
         } catch (ProcessingException e) {
             LOGGER.error(String.format("ProcessingException while getting bean %s/%s with id %s (%s)",
-                pivoteAttributeName, pivotValue, idValue, e));
+                pivotAttributeName, pivotValue, idValue, e));
             LOGGER.error(e.toString(), e);
             throw new LscServiceCommunicationException(e);
         } catch (NotFoundException e) {
-            LOGGER.debug(String.format("%s/%s with id %s not found", pivoteAttributeName, idValue, pivotValue));
+            LOGGER.debug(String.format("%s/%s with id %s not found", pivotAttributeName, idValue, pivotValue));
             return null;
         } catch (WebApplicationException e) {
             LOGGER.error(String.format("WebApplicationException while getting bean %s/%s with id %s (%s)",
-                pivoteAttributeName, pivotValue, idValue, e));
+                pivotAttributeName, pivotValue, idValue, e));
             LOGGER.debug(e.toString(), e);
             throw new LscServiceException(e);
         } catch (InstantiationException | IllegalAccessException e) {
@@ -150,6 +187,14 @@ public class MsGraphApiUsersSrcService implements IService {
 
         bean.setMainIdentifier(idValue);
         bean.setDatasets(new LscDatasets(user));
+        return bean;
+    }
+
+    private IBean userIdToBean(String idValue) throws InstantiationException, IllegalAccessException {
+        IBean bean = beanClass.newInstance();
+
+        bean.setMainIdentifier(idValue);
+        bean.setDatasets(new LscDatasets(ImmutableMap.of("id", idValue)));
         return bean;
     }
 

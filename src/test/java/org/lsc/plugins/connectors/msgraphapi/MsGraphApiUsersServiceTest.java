@@ -342,4 +342,88 @@ class MsGraphApiUsersServiceTest {
         assertThat(bean.getDatasetFirstValueById("id")).isNotBlank();
         assertThat(bean.getDatasetFirstValueById("userPrincipalName")).isNotBlank();
     }
+
+    @Test
+    void getBeanShouldReturnBeanWithIdWhenFromAnotherService() throws Exception {
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        LscDatasets datasets = new LscDatasets(ImmutableMap.of("mail", firstUserPivotValue));
+        IBean bean = testee.getBean("mainIdentifierFromDestinationService", datasets, !FROM_SAME_SERVICE);
+
+        assertThat(bean.getDatasetFirstValueById("id")).isNotBlank();
+    }
+
+    @Test
+    void getBeanShouldReturnNullWhenNonExistingUserFromAnotherService() throws Exception {
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        LscDatasets datasets = new LscDatasets(ImmutableMap.of("mail", "5f8c4178-6ea7-465e-b5ab-ab6ae59e6ffe"));
+        IBean bean = testee.getBean("mainIdentifierFromDestinationService", datasets, !FROM_SAME_SERVICE);
+
+        assertThat(bean).isNull();
+    }
+
+    @Test
+    void getBeanShouldReturnBeanWithIdWhenFromAnotherServiceAndIdPivot() throws Exception {
+        when(usersService.getPivot()).thenReturn("id");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        LscDatasets datasets = new LscDatasets(ImmutableMap.of("id", firstUserPivotValue));
+        IBean bean = testee.getBean("mainIdentifierFromDestinationService", datasets, !FROM_SAME_SERVICE);
+
+        assertThat(bean.getDatasetFirstValueById("id")).isNotBlank();
+    }
+
+    @Test
+    void getBeanShouldReturnNullWhenNonExistingUserFromAnotherServiceAndIdPivot() throws Exception {
+        when(usersService.getPivot()).thenReturn("id");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        LscDatasets datasets = new LscDatasets(ImmutableMap.of("id", "655681ac-8515-4ecf-837e-d9b271910576"));
+        IBean bean = testee.getBean("mainIdentifierFromDestinationService", datasets, !FROM_SAME_SERVICE);
+
+        assertThat(bean).isNull();
+    }
+
+    @Test
+    void getBeanShouldReturnBeanWithIdWhenFromAnotherServiceWithDifferentPivotName() throws Exception {
+        when(usersService.getPivot()).thenReturn("mail");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        LscDatasets datasets = new LscDatasets(ImmutableMap.of("email", firstUserPivotValue));
+        IBean bean = testee.getBean("mainIdentifierFromDestinationService", datasets, !FROM_SAME_SERVICE);
+
+        assertThat(bean.getDatasetFirstValueById("id")).isNotBlank();
+    }
+
+    @Test
+    void getBeanShouldReturnBeanWithIdWhenFromAnotherServiceWithDifferentPivotNameAndDefaultPivot() throws Exception {
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        LscDatasets datasets = new LscDatasets(ImmutableMap.of("email", firstUserPivotValue));
+        IBean bean = testee.getBean("mainIdentifierFromDestinationService", datasets, !FROM_SAME_SERVICE);
+
+        assertThat(bean.getDatasetFirstValueById("id")).isNotBlank();
+    }
+
+    @Test
+    void getBeanShouldReturnBeanWithIdWhenFromAnotherServiceWithDifferentPivotNameAndIdPivot() throws Exception {
+        when(usersService.getPivot()).thenReturn("id");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        Map<String, LscDatasets> pivots = testee.getListPivots();
+        String firstUserPivotValue = pivots.keySet().stream().findFirst().get();
+        LscDatasets datasets = new LscDatasets(ImmutableMap.of("uuid", firstUserPivotValue));
+        IBean bean = testee.getBean("mainIdentifierFromDestinationService", datasets, !FROM_SAME_SERVICE);
+
+        assertThat(bean.getDatasetFirstValueById("id")).isNotBlank();
+    }
 }
