@@ -58,14 +58,14 @@
                 <getOneFilter>(&amp;(objectClass=person)(mail={mail}))</getOneFilter>
             </ldapDestinationService>
             <propertiesBasedSyncOptions>
-                <mainIdentifier>"cn=" + srcBean.getDatasetFirstValueById('userPrincipalName') + ",ou=users,dc=example,dc=org";</mainIdentifier>
+                <mainIdentifier>"cn=" + javax.naming.ldap.Rdn.escapeValue(srcBean.getDatasetFirstValueById('userPrincipalName')) + ",ou=users,dc=example,dc=org";</mainIdentifier>
                 <defaultDelimiter>;</defaultDelimiter>
                 <defaultPolicy>FORCE</defaultPolicy>
                 <conditions>
                     <create>true</create>
                     <update>true</update>
                     <delete>true</delete>
-                    <changeId>false</changeId>
+                    <changeId>true</changeId>
                 </conditions>
                 <dataset>
                     <name>objectClass</name>

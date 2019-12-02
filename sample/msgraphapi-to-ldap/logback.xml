@@ -102,7 +102,7 @@
     <logger name="lsc">
         <appender-ref ref="LDIF"/>
     </logger>
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
     </root>
 </configuration>
