@@ -23,7 +23,7 @@
             <password></password>
             <msgraphapi:msGraphApiConnectionSettings>
                 <msgraphapi:clientId>${MS_GRAPH_API_CLIENT_ID}</msgraphapi:clientId>
-                <msgraphapi:clientSecret>MS_GRAPH_API_CLIENT_SECRET</msgraphapi:clientSecret>
+                <msgraphapi:clientSecret>${MS_GRAPH_API_CLIENT_SECRET}</msgraphapi:clientSecret>
                 <msgraphapi:tenant>${MS_GRAPH_API_TENANT}</msgraphapi:tenant>
             </msgraphapi:msGraphApiConnectionSettings>
         </pluginConnection>
