@@ -45,6 +45,7 @@ package org.lsc.plugins.connectors.msgraphapi;
 import static org.lsc.plugins.connectors.msgraphapi.MsGraphApiDao.ID;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -186,7 +187,13 @@ public class MsGraphApiUsersSrcService implements IService {
         IBean bean = beanClass.newInstance();
 
         bean.setMainIdentifier(idValue);
-        bean.setDatasets(new LscDatasets(user));
+
+        LscDatasets datasets = new LscDatasets();
+        user.entrySet().stream()
+            .forEach(entry -> datasets.put(entry.getKey(), entry.getValue() == null ? new LinkedHashSet<>() : entry.getValue()));
+
+        bean.setDatasets(datasets);
+
         return bean;
     }
 

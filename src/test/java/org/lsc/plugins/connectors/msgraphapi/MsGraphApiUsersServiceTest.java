@@ -309,12 +309,12 @@ class MsGraphApiUsersServiceTest {
     }
 
     @Test
-    void mapToBeanShouldPreserveNull() throws Exception{
+    void mapToBeanShouldReplaceNullByEmptySet() throws Exception{
         MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
 
         IBean bean = testee.mapToBean("id", Maps.newHashMap("givenName", null));
 
-        assertThat(bean.getDatasetById("givenName")).isNull();
+        assertThat(bean.getDatasetById("givenName")).isEmpty();
     }
 
     @Test
