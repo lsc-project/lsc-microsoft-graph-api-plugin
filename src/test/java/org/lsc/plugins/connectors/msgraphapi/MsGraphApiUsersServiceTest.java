@@ -43,6 +43,7 @@
 package org.lsc.plugins.connectors.msgraphapi;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
@@ -392,11 +393,22 @@ class MsGraphApiUsersServiceTest {
     }
 
     @Test
-    void getBeanShouldThrowAnLscExceptionWithACauseDifferentThanACommunicationExceptionWhenMalformedPivot() throws Exception {
+    void getBeanShouldNotThrowWhenNonExistingUserFromAnotherServiceWithSingleQuoteAndIdPivot() throws Exception {
         when(usersService.getPivot()).thenReturn("id");
         MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
 
         LscDatasets datasets = new LscDatasets(ImmutableMap.of("id", "us'er@test"));
+
+        assertThatCode(() -> testee.getBean("mainIdentifierFromDestinationService", datasets, !FROM_SAME_SERVICE))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
+    void getBeanShouldThrowAnLscExceptionWithACauseDifferentThanACommunicationExceptionWhenMalformedPivot() throws Exception {
+        when(usersService.getPivot()).thenReturn("id");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        LscDatasets datasets = new LscDatasets(ImmutableMap.of("id", "us%27er@test"));
 
         assertThatThrownBy(() -> testee.getBean("mainIdentifierFromDestinationService", datasets, !FROM_SAME_SERVICE))
             .isInstanceOf(LscServiceException.class)
