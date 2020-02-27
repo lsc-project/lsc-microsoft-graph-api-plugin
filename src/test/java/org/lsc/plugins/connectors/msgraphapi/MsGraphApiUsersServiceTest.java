@@ -50,6 +50,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Map;
 
+import javax.naming.CommunicationException;
+
 import org.assertj.core.util.Maps;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -387,6 +389,20 @@ class MsGraphApiUsersServiceTest {
         IBean bean = testee.getBean("mainIdentifierFromDestinationService", datasets, !FROM_SAME_SERVICE);
 
         assertThat(bean).isNull();
+    }
+
+    @Test
+    void getBeanShouldThrowAnLscExceptionWithACauseDifferentThanACommunicationExceptionWhenMalformedPivot() throws Exception {
+        when(usersService.getPivot()).thenReturn("id");
+        MsGraphApiUsersSrcService testee = new MsGraphApiUsersSrcService(task);
+
+        LscDatasets datasets = new LscDatasets(ImmutableMap.of("id", "us'er@test"));
+
+        assertThatThrownBy(() -> testee.getBean("mainIdentifierFromDestinationService", datasets, !FROM_SAME_SERVICE))
+            .isInstanceOf(LscServiceException.class)
+            .extracting(e -> e.getCause())
+            .isNotNull()
+            .isNotInstanceOf(CommunicationException.class);
     }
 
     @Test
