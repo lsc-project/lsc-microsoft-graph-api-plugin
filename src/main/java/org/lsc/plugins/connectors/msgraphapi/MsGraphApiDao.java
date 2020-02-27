@@ -49,6 +49,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -105,7 +106,7 @@ public class MsGraphApiDao {
         return getUsersList(filter);
     }
 
-    private List<User> getUsersList(Optional<String> computedFilter) throws LscServiceException {
+    private List<User> getUsersList(Optional<String> computedFilter) {
         WebTarget target = pivot.equals(ID) ? usersClient.queryParam("$select", pivot) : usersClient.queryParam("$select","id," + pivot);
 
         if (computedFilter.isPresent()) {
@@ -141,7 +142,7 @@ public class MsGraphApiDao {
         return true;
     }
 
-    private UsersListResponse getUsersListResponse(WebTarget target) throws LscServiceException {
+    private UsersListResponse getUsersListResponse(WebTarget target) {
         LOGGER.debug("GETting users list or following page: " + target.getUri().toString());
 
         Response response = null;
@@ -156,7 +157,7 @@ public class MsGraphApiDao {
             if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new NotFoundException("Not found when requesting " + target.getUri());
             }
-            throw new LscServiceException(response.readEntity(String.class));
+            throw new ProcessingException(response.readEntity(String.class));
         } finally {
             if (response != null) {
                 response.close();
@@ -168,7 +169,7 @@ public class MsGraphApiDao {
         return Response.Status.Family.familyOf(response.getStatus()) == Response.Status.Family.SUCCESSFUL;
     }
 
-    public Map<String, Object> getUserDetails(String id) throws LscServiceException {
+    public Map<String, Object> getUserDetails(String id) {
 
         Response response = null;
         try {
@@ -189,7 +190,7 @@ public class MsGraphApiDao {
             if (response.getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
                 throw new NotFoundException(id + " cannot be found");
             }
-            throw new LscServiceException(response.readEntity(String.class));
+            throw new ProcessingException(response.readEntity(String.class));
         } finally {
             if (response != null) {
                 response.close();
@@ -198,7 +199,7 @@ public class MsGraphApiDao {
 
     }
 
-    public Optional<User> getFirstUserWithId(String pivotValue) throws LscServiceException {
+    public Optional<User> getFirstUserWithId(String pivotValue) {
         String pivotFilter = pivot + " eq '" + pivotValue + "'";
         String computedFilter = filter.map(f -> "(" + f + ")" + " and " + pivotFilter)
             .orElse(pivotFilter);
