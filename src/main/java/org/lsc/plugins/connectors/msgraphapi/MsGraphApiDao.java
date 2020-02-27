@@ -200,7 +200,7 @@ public class MsGraphApiDao {
     }
 
     public Optional<User> getFirstUserWithId(String pivotValue) {
-        String pivotFilter = pivot + " eq '" + pivotValue + "'";
+        String pivotFilter = pivot + " eq '" + pivotValue.replaceAll("'", "''") + "'";
         String computedFilter = filter.map(f -> "(" + f + ")" + " and " + pivotFilter)
             .orElse(pivotFilter);
         return getUsersList(Optional.of(computedFilter))
