@@ -64,6 +64,7 @@ import org.glassfish.jersey.jackson.JacksonFeature;
 import org.lsc.exception.LscServiceException;
 import org.lsc.plugins.connectors.msgraphapi.beans.User;
 import org.lsc.plugins.connectors.msgraphapi.beans.UsersListResponse;
+import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiConnectionSettings;
 import org.lsc.plugins.connectors.msgraphapi.generated.MsGraphApiUsersService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +72,7 @@ import org.slf4j.LoggerFactory;
 public class MsGraphApiDao {
     public static final String USER_PATH = "/users";
     public static final String DEFAULT_PIVOT = "mail";
+    public static final String DEFAULT_USERS_URL = "https://graph.microsoft.com";
     public static final String ID = "id";
     private static final Logger LOGGER = LoggerFactory.getLogger(MsGraphApiDao.class);
 
@@ -80,20 +82,22 @@ public class MsGraphApiDao {
 
     private final Optional<Integer> pageSize;
     private final String pivot;
+    private final String usersURL;
     private final Optional<String> filter;
     private final Optional<String> select;
 
-    public MsGraphApiDao(String token, MsGraphApiUsersService serviceConfiguration) {
+    public MsGraphApiDao(String token, MsGraphApiConnectionSettings settings, MsGraphApiUsersService serviceConfiguration) {
         authorizationBearer = "Bearer " + token;
         this.filter = getStringParameter(serviceConfiguration.getFilter());
         this.select = getStringParameter(serviceConfiguration.getSelect());
         this.pivot = getStringParameter(serviceConfiguration.getPivot()).orElse(DEFAULT_PIVOT);
+        this.usersURL = getStringParameter(settings.getUsersURL()).orElse(DEFAULT_USERS_URL);
         this.pageSize = Optional.ofNullable(serviceConfiguration.getPageSize()).filter(size -> size > 0);
         LOGGER.debug("bearer " + authorizationBearer);
         client = ClientBuilder.newClient()
             .register(JacksonFeature.class);
         usersClient = client
-            .target("https://graph.microsoft.com")
+            .target(this.usersURL)
             .path("v1.0")
             .path(USER_PATH);
     }

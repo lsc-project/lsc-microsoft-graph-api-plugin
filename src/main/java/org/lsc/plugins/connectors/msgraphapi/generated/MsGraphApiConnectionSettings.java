@@ -25,6 +25,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
+ *         &lt;element name="authenticationURL" type="{http://www.w3.org/2001/XMLSchema}string"/>
+ *         &lt;element name="usersURL" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="clientId" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="clientSecret" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="tenant" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -38,6 +40,8 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
+    "authenticationURL",
+    "usersURL",
     "clientId",
     "clientSecret",
     "tenant"
@@ -46,11 +50,63 @@ import javax.xml.bind.annotation.XmlType;
 public class MsGraphApiConnectionSettings {
 
     @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd", required = true)
+    protected String authenticationURL;
+    @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd", required = true)
+    protected String usersURL;
+    @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd", required = true)
     protected String clientId;
     @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd", required = true)
     protected String clientSecret;
     @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd", required = true)
     protected String tenant;
+
+    /**
+     * Gets the value of the authenticationURL property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getAuthenticationURL() {
+        return authenticationURL;
+    }
+
+    /**
+     * Sets the value of the authenticationURL property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setAuthenticationURL(String value) {
+        this.authenticationURL = value;
+    }
+
+    /**
+     * Gets the value of the usersURL property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getUsersURL() {
+        return usersURL;
+    }
+
+    /**
+     * Sets the value of the usersURL property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setUsersURL(String value) {
+        this.usersURL = value;
+    }
 
     /**
      * Gets the value of the clientId property.

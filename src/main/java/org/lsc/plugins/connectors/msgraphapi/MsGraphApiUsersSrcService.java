@@ -101,10 +101,10 @@ public class MsGraphApiUsersSrcService implements IService {
             settings = (MsGraphApiConnectionSettings) pluginConnectionType.getAny().get(0);
 
             String token = new MsGraphApiAuthentication()
-                .authenticate(settings.getTenant(), settings.getClientId(), settings.getClientSecret())
+                .authenticate(settings.getTenant(), settings.getAuthenticationURL(), settings.getClientId(), settings.getClientSecret())
                 .getAccessToken();
 
-            dao = new MsGraphApiDao(token, service);
+            dao = new MsGraphApiDao(token, settings, service);
 
         } catch (ClassNotFoundException | AuthorizationException e) {
             throw new LscServiceConfigurationException(e);
