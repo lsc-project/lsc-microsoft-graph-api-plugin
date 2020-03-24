@@ -86,7 +86,11 @@ class MsGraphApiUsersServiceTest {
         String clientId = System.getenv("TEST_MS_GRAPH_API_CLIENT_ID");
         String clientSecret = System.getenv("TEST_MS_GRAPH_API_CLIENT_SECRET");
         String tenant = System.getenv("TEST_MS_GRAPH_API_TENANT");
+        String authenticationURL = System.getenv("TEST_MS_GRAPH_API_AUTHENTICATION_URL");
+        String usersURL = System.getenv("TEST_MS_GRAPH_API_USERS_URL");
 
+        assumeTrue(StringUtils.isNotBlank(authenticationURL));
+        assumeTrue(StringUtils.isNotBlank(usersURL));
         assumeTrue(StringUtils.isNotBlank(clientId));
         assumeTrue(StringUtils.isNotBlank(clientSecret));
         assumeTrue(StringUtils.isNotBlank(tenant));
@@ -103,6 +107,8 @@ class MsGraphApiUsersServiceTest {
         when(connectionSettings.getClientId()).thenReturn(clientId);
         when(connectionSettings.getClientSecret()).thenReturn(clientSecret);
         when(connectionSettings.getTenant()).thenReturn(tenant);
+        when(connectionSettings.getAuthenticationURL()).thenReturn(authenticationURL);
+        when(connectionSettings.getUsersURL()).thenReturn(usersURL);
         when(task.getBean()).thenReturn("org.lsc.beans.SimpleBean");
         when(task.getPluginSourceService()).thenReturn(pluginSourceService);
     }
