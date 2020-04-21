@@ -54,21 +54,31 @@ import org.lsc.plugins.connectors.msgraphapi.beans.AuthenticationResponse;
 
 public class MsGraphApiAuthentication {
     private static final String DEFAULT_AUTHENTICATION_URL = "https://login.microsoftonline.com/";
-    private static final String GRAPH_DEFAULT_SCOPE = "https://graph.microsoft.com/.default";
+    private static final String DEFAULT_USERS_URL = "https://graph.microsoft.com";
+    private static final String GRAPH_DEFAULT_SCOPE = "/.default";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public AuthenticationResponse authenticate(String tenant, String authenticationURL, String clientId, String clientSecret) throws AuthorizationException {
+    public AuthenticationResponse authenticate(String tenant, String authenticationURL, String usersURL, String clientId, String clientSecret) throws AuthorizationException {
+
         if( authenticationURL == null || authenticationURL.isEmpty() )
         {
             authenticationURL = DEFAULT_AUTHENTICATION_URL;
         }
+
+        String scope;
+        if( usersURL == null || usersURL.isEmpty() )
+        {
+            usersURL = DEFAULT_USERS_URL;
+        }
+        scope = usersURL.replaceAll("/$", "") + GRAPH_DEFAULT_SCOPE;
+
         WebTarget authTarget = ClientBuilder.newClient()
             .register(JacksonFeature.class)
             .target(authenticationURL)
             .path(tenant)
             .path("oauth2/v2.0/token");
         Form authForm = new Form("client_id", clientId)
-            .param("scope", GRAPH_DEFAULT_SCOPE)
+            .param("scope", scope)
             .param("client_secret", clientSecret)
             .param("grant_type", "client_credentials");
 
