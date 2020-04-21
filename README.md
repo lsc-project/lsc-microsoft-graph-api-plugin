@@ -28,9 +28,9 @@ The values to configure are:
 
 ##### Connection
 
-  - `connections.pluginConnection.msGraphApiConnectionSettings.authenticationURL`: The base URL used for authentication (default is https://login.microsoftonline.com/)
-  - `connections.pluginConnection.msGraphApiConnectionSettings.usersURL`: The base URL used for operations on users (default is https://graph.microsoft.com)
-  - `connections.pluginConnection.msGraphApiConnectionSettings.scope`: The scope url used during authentication (default is https://graph.microsoft.com/.default)
+  - `connections.pluginConnection.msGraphApiConnectionSettings.authenticationURL`: The base URL used for authentication (default is https://login.microsoftonline.com/) (optional)
+  - `connections.pluginConnection.msGraphApiConnectionSettings.usersURL`: The base URL used for operations on users (default is https://graph.microsoft.com) (optional)
+  - `connections.pluginConnection.msGraphApiConnectionSettings.scope`: The scope url used during authentication (default is https://graph.microsoft.com/.default) (optional)
   - `connections.pluginConnection.msGraphApiConnectionSettings.clientId`: The client id for the application
   - `connections.pluginConnection.msGraphApiConnectionSettings.clientSecret`: The client secret used to connect to the application
   - `connections.pluginConnection.msGraphApiConnectionSettings.tenant`: The  Azure AD  tenant
