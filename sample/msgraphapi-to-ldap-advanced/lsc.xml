@@ -24,6 +24,7 @@
             <msgraphapi:msGraphApiConnectionSettings>
                 <msgraphapi:authenticationURL>${MS_GRAPH_API_AUTHENTICATION_URL}</msgraphapi:authenticationURL>
                 <msgraphapi:usersURL>${MS_GRAPH_API_USERS_URL}</msgraphapi:usersURL>
+                <msgraphapi:scope>${MS_GRAPH_API_SCOPE}</msgraphapi:scope>
                 <msgraphapi:clientId>${MS_GRAPH_API_CLIENT_ID}</msgraphapi:clientId>
                 <msgraphapi:clientSecret>${MS_GRAPH_API_CLIENT_SECRET}</msgraphapi:clientSecret>
                 <msgraphapi:tenant>${MS_GRAPH_API_TENANT}</msgraphapi:tenant>

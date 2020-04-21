@@ -101,7 +101,7 @@ public class MsGraphApiUsersSrcService implements IService {
             settings = (MsGraphApiConnectionSettings) pluginConnectionType.getAny().get(0);
 
             String token = new MsGraphApiAuthentication()
-                .authenticate(settings.getTenant(), settings.getAuthenticationURL(), settings.getUsersURL(), settings.getClientId(), settings.getClientSecret())
+                .authenticate(settings.getTenant(), settings.getAuthenticationURL(), settings.getScope(), settings.getClientId(), settings.getClientSecret())
                 .getAccessToken();
 
             dao = new MsGraphApiDao(token, settings, service);
