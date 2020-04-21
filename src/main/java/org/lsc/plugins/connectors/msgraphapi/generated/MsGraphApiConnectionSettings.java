@@ -51,11 +51,11 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "msGraphApiConnectionSettings", namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd")
 public class MsGraphApiConnectionSettings {
 
-    @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd", required = true)
+    @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd", required = false)
     protected String authenticationURL;
-    @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd", required = true)
+    @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd", required = false)
     protected String usersURL;
-    @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd", required = true)
+    @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd", required = false)
     protected String scope;
     @XmlElement(namespace = "http://lsc-project.org/XSD/lsc-microsoft-graph-api-plugin-1.0.xsd", required = true)
     protected String clientId;
