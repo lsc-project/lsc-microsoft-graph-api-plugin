@@ -60,6 +60,7 @@ class MsGraphApiAuthenticationTest {
     private final static String CLIENT_SECRET = System.getenv("TEST_MS_GRAPH_API_CLIENT_SECRET");
     private final static String TENANT = System.getenv("TEST_MS_GRAPH_API_TENANT");
     private final static String AUTHENTICATION_URL = System.getenv("TEST_MS_GRAPH_API_AUTHENTICATION_URL");
+    private final static String USERS_URL = System.getenv("TEST_MS_GRAPH_API_USERS_URL");
 
     private final MsGraphApiAuthentication msGraphApiAuthentication;
 
@@ -76,24 +77,24 @@ class MsGraphApiAuthenticationTest {
 
     @Test
     void shouldObtainValidAccessToken() throws AuthorizationException {
-        AuthenticationResponse response = msGraphApiAuthentication.authenticate(TENANT, AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET);
+        AuthenticationResponse response = msGraphApiAuthentication.authenticate(TENANT, AUTHENTICATION_URL, USERS_URL, CLIENT_ID, CLIENT_SECRET);
         assertThat(response.getAccessToken()).isNotBlank();
         assertThatCode(() -> JWT.decode(response.getAccessToken())).doesNotThrowAnyException();
     }
 
     @Test
     void shouldThrowIfInvalidTenant() {
-        assertThatThrownBy(() -> msGraphApiAuthentication.authenticate("NOT_A_TENANT", AUTHENTICATION_URL, CLIENT_ID, CLIENT_SECRET)).isInstanceOf(AuthorizationException.class);
+        assertThatThrownBy(() -> msGraphApiAuthentication.authenticate("NOT_A_TENANT", AUTHENTICATION_URL, USERS_URL, CLIENT_ID, CLIENT_SECRET)).isInstanceOf(AuthorizationException.class);
     }
 
     @Test
     void shouldThrowIfInvalidClientId() {
-        assertThatThrownBy(() -> msGraphApiAuthentication.authenticate(TENANT, AUTHENTICATION_URL, "NOT_A_CLIENT_ID", CLIENT_SECRET)).isInstanceOf(AuthorizationException.class);
+        assertThatThrownBy(() -> msGraphApiAuthentication.authenticate(TENANT, AUTHENTICATION_URL, USERS_URL, "NOT_A_CLIENT_ID", CLIENT_SECRET)).isInstanceOf(AuthorizationException.class);
     }
 
     @Test
     void shouldThrowIfInvalidClientSecret() {
-        assertThatThrownBy(() -> msGraphApiAuthentication.authenticate(TENANT, AUTHENTICATION_URL, CLIENT_ID, "NOT_A_SECRET")).isInstanceOf(AuthorizationException.class);
+        assertThatThrownBy(() -> msGraphApiAuthentication.authenticate(TENANT, AUTHENTICATION_URL, USERS_URL, CLIENT_ID, "NOT_A_SECRET")).isInstanceOf(AuthorizationException.class);
     }
 
 }
