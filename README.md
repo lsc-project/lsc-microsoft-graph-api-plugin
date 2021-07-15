@@ -44,7 +44,7 @@ The values to configure are:
 
 The jar of the Microsoft graph API LSC plugin must be copied in the `lib` directory of your LSC installation. Then you can launch it with the following command line:
 ```
-`̀`` JAVA_OPTS="-DLSC.PLUGINS.PACKAGEPATH=org.lsc.plugins.connectors.msgraphapi.generated" bin/lsc --config /path/to/sample/msgraphapi-to-ldap/ --synchronize users --clean users --threads 5
+JAVA_OPTS="-DLSC.PLUGINS.PACKAGEPATH=org.lsc.plugins.connectors.msgraphapi.generated" bin/lsc --config /path/to/sample/msgraphapi-to-ldap/ --synchronize users --clean users --threads 5
 ```
 ### Packaging
 
