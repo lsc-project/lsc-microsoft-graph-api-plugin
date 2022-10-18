@@ -46,9 +46,11 @@ import static org.lsc.plugins.connectors.msgraphapi.MsGraphApiDao.ID;
 
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.LinkedHashMap;
 
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
@@ -189,8 +191,26 @@ public class MsGraphApiUsersSrcService implements IService {
         bean.setMainIdentifier(idValue);
 
         LscDatasets datasets = new LscDatasets();
-        user.entrySet().stream()
-            .forEach(entry -> datasets.put(entry.getKey(), entry.getValue() == null ? new LinkedHashSet<>() : entry.getValue()));
+        /* In new version, graphApi uses LinkedHashMap values
+         * like: Key={childKey=value, childKey2=value2, ...}
+         * Then in this case you could retrieve in bean
+         * attribute values as "<Key>/<childKey>" = "<childValue>".
+         * ex: "onPremisesExtensionAttributes/extensionAttribute1" = "toto"
+        */
+        for (Map.Entry entry : user.entrySet()) {
+            if (entry.getValue() instanceof java.util.LinkedHashMap) {
+                LinkedHashMap innerMap = (LinkedHashMap) entry.getValue();
+                Set<String> keys = innerMap.keySet();
+                for ( String key : keys ) {
+                    datasets.put(entry.getKey() + "/" + key,
+                        innerMap.get(key) == null ? new LinkedHashSet<>() : innerMap.get(key));
+                }
+            }
+            else {
+                datasets.put((String)entry.getKey(),
+                    entry.getValue() == null ? new LinkedHashSet<>() : entry.getValue());
+            }
+        }
 
         bean.setDatasets(datasets);
 

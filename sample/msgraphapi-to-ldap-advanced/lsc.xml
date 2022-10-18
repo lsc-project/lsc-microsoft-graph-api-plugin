@@ -45,7 +45,7 @@
                     <msgraphapi:filter>startsWith(mail, 'a')</msgraphapi:filter>
                     <msgraphapi:pivot>userPrincipalName</msgraphapi:pivot>
                     <msgraphapi:pageSize>999</msgraphapi:pageSize>
-                    <msgraphapi:select>userPrincipalName,mail,displayName</msgraphapi:select>
+                    <msgraphapi:select>userPrincipalName,mail,displayName,onPremisesExtensionAttributes</msgraphapi:select>
                 </msgraphapi:msGraphApiUsersService>
             </pluginSourceService>
             <ldapDestinationService>
@@ -61,6 +61,7 @@
                     <string>cn</string>
                     <string>mail</string>
                     <string>sn</string>
+		    <string>description</string>
                 </fetchedAttributes>
                 <getAllFilter>(&amp;(objectClass=person)(uid=*))</getAllFilter>
                 <getOneFilter>(&amp;(objectClass=person)(uid={userPrincipalName}))</getOneFilter>
@@ -97,6 +98,12 @@
                     <name>sn</name>
                     <forceValues>
                         <string>srcBean.getDatasetValuesById("displayName")</string>
+                    </forceValues>
+                </dataset>
+                <dataset>
+                    <name>description<name>
+                    <forceValues>
+                    <string>srcBean.getDatasetFirstValueById("onPremisesExtensionAttributes/extensionAttribute1")</string>
                     </forceValues>
                 </dataset>
             </propertiesBasedSyncOptions>
