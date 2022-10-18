@@ -50,18 +50,24 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class UsersListResponse {
     private final String context;
+    private final String count;
     private final String nextLink;
     private final List<Map<String, Object>> value;
 
     @JsonCreator
-    public UsersListResponse(@JsonProperty("@odata.context") String context, @JsonProperty("@odata.nextLink") String nextLink, @JsonProperty("value") List<Map<String, Object>> value) {
+    public UsersListResponse(@JsonProperty("@odata.context") String context, @JsonProperty("@odata.count") String count, @JsonProperty("@odata.nextLink") String nextLink, @JsonProperty("value") List<Map<String, Object>> value) {
         this.context = context;
+        this.count = count;
         this.nextLink = nextLink;
         this.value = value;
     }
 
     public String getContext() {
         return context;
+    }
+
+    public String getCount() {
+        return count;
     }
 
     public String getNextLink() {

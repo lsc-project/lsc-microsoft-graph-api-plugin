@@ -72,7 +72,7 @@ import org.slf4j.LoggerFactory;
 public class MsGraphApiDao {
     public static final String USER_PATH = "/users";
     public static final String DEFAULT_PIVOT = "mail";
-    public static final String DEFAULT_USERS_URL = "https://graph.microsoft.com";
+    public static final String DEFAULT_USERS_URL = "https://graph.microsoft.com/v1.0/users";
     public static final String ID = "id";
     private static final Logger LOGGER = LoggerFactory.getLogger(MsGraphApiDao.class);
 
@@ -97,9 +97,7 @@ public class MsGraphApiDao {
         client = ClientBuilder.newClient()
             .register(JacksonFeature.class);
         usersClient = client
-            .target(this.usersURL)
-            .path("v1.0")
-            .path(USER_PATH);
+            .target(this.usersURL);
     }
 
     private Optional<String> getStringParameter(String parameter) {
@@ -114,6 +112,7 @@ public class MsGraphApiDao {
         WebTarget target = pivot.equals(ID) ? usersClient.queryParam("$select", pivot) : usersClient.queryParam("$select","id," + pivot);
 
         if (computedFilter.isPresent()) {
+            target = target.queryParam("$count", "true");
             target = target.queryParam("$filter", computedFilter.get());
         }
         if (pageSize.isPresent()) {
@@ -153,6 +152,7 @@ public class MsGraphApiDao {
         try {
             response = target.request()
                 .header(HttpHeaders.AUTHORIZATION, authorizationBearer)
+                .header("ConsistencyLevel", "eventual")
                 .accept(MediaType.APPLICATION_JSON_TYPE)
                 .get();
             if (checkResponse(response)) {
