@@ -29,7 +29,7 @@ The values to configure are:
 ##### Connection
 
   - `connections.pluginConnection.msGraphApiConnectionSettings.authenticationURL`: The base URL used for authentication (default is https://login.microsoftonline.com/) (optional)
-  - `connections.pluginConnection.msGraphApiConnectionSettings.usersURL`: The base URL used for operations on users (default is https://graph.microsoft.com) (optional)
+  - `connections.pluginConnection.msGraphApiConnectionSettings.usersURL`: The base URL used for operations on users (default is https://graph.microsoft.com/v1.0/users) (optional)
   - `connections.pluginConnection.msGraphApiConnectionSettings.scope`: The scope url used during authentication (default is https://graph.microsoft.com/.default) (optional)
   - `connections.pluginConnection.msGraphApiConnectionSettings.clientId`: The client id for the application
   - `connections.pluginConnection.msGraphApiConnectionSettings.clientSecret`: The client secret used to connect to the application
@@ -47,5 +47,9 @@ The jar of the Microsoft graph API LSC plugin must be copied in the `lib` direct
 JAVA_OPTS="-DLSC.PLUGINS.PACKAGEPATH=org.lsc.plugins.connectors.msgraphapi.generated" bin/lsc --config /path/to/sample/msgraphapi-to-ldap/ --synchronize users --clean users --threads 5
 ```
 ### Packaging
+
+Clone project then cd inside.
+Be sure to have java 8 install then run by default (on debian)::
+"JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 mvn clean package"
 
 WIP
