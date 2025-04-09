@@ -44,6 +44,8 @@ package org.lsc.plugins.connectors.msgraphapi;
 
 import static org.lsc.plugins.connectors.msgraphapi.MsGraphApiDao.ID;
 
+import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -52,12 +54,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.LinkedHashMap;
 
-import javax.ws.rs.NotFoundException;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.WebApplicationException;
+import jakarta.ws.rs.NotFoundException;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.WebApplicationException;
 
 import org.lsc.LscDatasets;
 import org.lsc.beans.IBean;
+import org.lsc.configuration.ConnectionType;
 import org.lsc.configuration.PluginConnectionType;
 import org.lsc.configuration.TaskType;
 import org.lsc.exception.LscServiceCommunicationException;
@@ -245,4 +248,10 @@ public class MsGraphApiUsersSrcService implements IService {
             throw new LscServiceException(e);
         }
     }
+
+    public Collection<Class<? extends ConnectionType>> getSupportedConnectionType() {
+        Collection<Class<? extends ConnectionType>> list = new ArrayList<Class<? extends ConnectionType>>();
+        return list;
+    }
+
 }

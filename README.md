@@ -49,7 +49,10 @@ JAVA_OPTS="-DLSC.PLUGINS.PACKAGEPATH=org.lsc.plugins.connectors.msgraphapi.gener
 ### Packaging
 
 Clone project then cd inside.
-Be sure to have java 8 install then run by default (on debian)::
-"JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 mvn clean package"
+Be sure to have java 21 installed, then run by default (on debian):
+
+```
+JAVA_HOME=/usr/lib/jvm/java-21-openjdk-amd64 mvn clean package
+```
 
 WIP
