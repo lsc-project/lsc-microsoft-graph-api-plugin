@@ -6,7 +6,7 @@
     <groupId>org.lsc.plugins.connectors</groupId>
     <artifactId>microsoft-graph-api</artifactId>
     <name>LDAP Synchronization Connector for Microsoft graph API</name>
-    <version>1.2</version>
+    <version>1.3-SNAPSHOT</version>
     <description>
         This project provides a Microsoft graph API source plugin for LSC
     </description>
