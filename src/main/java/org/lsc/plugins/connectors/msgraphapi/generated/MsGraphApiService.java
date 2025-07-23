@@ -24,7 +24,7 @@ import org.lsc.configuration.ServiceType;
  * <pre>
  * &lt;complexType name="msGraphApiService">
  *   &lt;complexContent>
- *     &lt;extension base="{http://lsc-project.org/XSD/lsc-core-2.1.xsd}serviceType">
+ *     &lt;extension base="{http://lsc-project.org/XSD/lsc-core-2.2.xsd}serviceType">
  *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>
