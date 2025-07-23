@@ -5,5 +5,5 @@
 // Generated on: 2019.11.29 at 11:43:47 AM CET 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://lsc-project.org/XSD/lsc-core-2.1.xsd", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@javax.xml.bind.annotation.XmlSchema(namespace = "http://lsc-project.org/XSD/lsc-core-2.2.xsd", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package org.lsc.plugins.connectors.msgraphapi.generated;
