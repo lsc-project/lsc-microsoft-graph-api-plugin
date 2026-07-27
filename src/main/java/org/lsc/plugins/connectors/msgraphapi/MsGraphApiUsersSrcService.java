@@ -59,6 +59,7 @@ import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.WebApplicationException;
 
 import org.lsc.LscDatasets;
+import org.lsc.Task;
 import org.lsc.beans.IBean;
 import org.lsc.configuration.ConnectionType;
 import org.lsc.configuration.PluginConnectionType;
@@ -117,7 +118,7 @@ public class MsGraphApiUsersSrcService implements IService {
     }
 
     @Override
-    public IBean getBean(String pivotAttributeName, LscDatasets pivotAttributes, boolean fromSameService) throws LscServiceException {
+    public IBean getBean(Task task, String pivotAttributeName, LscDatasets pivotAttributes, boolean fromSameService) throws LscServiceException {
         LOGGER.debug(String.format("Call to getBean(%s, %s, %b)", pivotAttributeName, pivotAttributes, fromSameService));
         if (pivotAttributes.getAttributesNames().size() < 1) {
             return null;
@@ -229,7 +230,7 @@ public class MsGraphApiUsersSrcService implements IService {
     }
 
     @Override
-    public Map<String, LscDatasets> getListPivots() throws LscServiceException {
+    public Map<String, LscDatasets> getListPivots(Task task) throws LscServiceException {
         try {
             List<User> userList = dao.getUsersList();
 
